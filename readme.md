@@ -1,7 +1,7 @@
 ## What is this?
 [![Docker Image CI](https://github.com/macbre/docker-nginx-http3/actions/workflows/dockerimage.yml/badge.svg)](https://github.com/macbre/docker-nginx-http3/actions/workflows/dockerimage.yml)
 
-Stable and up-to-date [nginx](https://nginx.org/en/CHANGES) with [QUIC + **HTTP/3 experimental support**](https://hg.nginx.org/nginx-quic/shortlog/quic), [Google's `brotli` compression](https://github.com/google/ngx_brotli) and [Grade A+ SSL config](https://ssl-config.mozilla.org/)
+Stable and up-to-date [nginx](https://nginx.org/en/CHANGES) with [QUIC + **HTTP/3 experimental support**](https://hg.nginx.org/nginx-quic/shortlog/quic), [Google's `brotli` compression](https://github.com/google/ngx_brotli), [`njs` module](https://nginx.org/en/docs/njs/) and [Grade A+ SSL config](https://ssl-config.mozilla.org/)
 
 nginx binary is built from [`quic` experimental branch](https://hg.nginx.org/nginx-quic/shortlog/quic). It's **not production-ready** yet!
 
@@ -24,15 +24,16 @@ docker pull ghcr.io/macbre/nginx-http3:latest
 * [`headers-more-nginx-module`](https://github.com/openresty/headers-more-nginx-module#readme) - sets and clears HTTP request and response headers
 * [`ngx_brotli`](https://github.com/google/ngx_brotli#configuration-directives) - adds [brotli response compression](https://datatracker.ietf.org/doc/html/rfc7932)
 * [`ngx_http_geoip2_module`](https://github.com/leev/ngx_http_geoip2_module#download-maxmind-geolite2-database-optional) - creates variables with values from the maxmind geoip2 databases based on the client IP
+* [`njs` module](https://nginx.org/en/docs/njs/) - a subset of the JavaScript language that allows extending nginx functionality
 
 ```
 $ docker run -it macbre/nginx-http3 nginx -V
-nginx version: nginx/1.21.6 (quic-7c2adf237091-boringssl-123eaaef26abc278f53ae338e9c758eb01c70b08)
-built by gcc 10.3.1 20210424 (Alpine 10.3.1_git20210424) 
+nginx version: nginx/1.23.1 (quic-3550b00d9dc8-boringssl-8ce0e1c14e48109773f1e94e5f8b020aa1e24dc5)
+built by gcc 11.2.1 20220219 (Alpine 11.2.1_git20220219)
 built with OpenSSL 1.1.1 (compatible; BoringSSL) (running with BoringSSL)
 TLS SNI support enabled
 configure arguments: 
-	--build=quic-7c2adf237091-boringssl-123eaaef26abc278f53ae338e9c758eb01c70b08 
+	--build=quic-3550b00d9dc8-boringssl-8ce0e1c14e48109773f1e94e5f8b020aa1e24dc5 
 	--prefix=/etc/nginx 
 	--sbin-path=/usr/sbin/nginx 
 	--modules-path=/usr/lib/nginx/modules 
@@ -79,10 +80,14 @@ configure arguments:
 	--with-http_v2_module 
 	--with-http_v3_module 
 	--add-module=/usr/src/ngx_brotli 
-	--add-module=/usr/src/headers-more-nginx-module-0.33 
-	--add-dynamic-module=/ngx_http_geoip2_module 
+	--add-module=/usr/src/headers-more-nginx-module-0.34 
+	--add-module=/usr/src/njs/nginx 
+	--add-dynamic-module=/usr/src/ngx_http_geoip2_module
 	--with-cc-opt=-I../boringssl/include 
 	--with-ld-opt='-L../boringssl/build/ssl -L../boringssl/build/crypto'
+
+$ docker run -it macbre/nginx-http3 njs -v
+0.7.7
 ```
 
 ## SSL Grade A+ handling
@@ -127,7 +132,7 @@ server {
     ssl_early_data on;
 
     # Add Alt-Svc header to negotiate HTTP/3.
-    add_header alt-svc 'h3-27=":443"; ma=86400, h3-28=":443"; ma=86400, h3-29=":443"; ma=86400';
+    add_header alt-svc 'h3=":443"; ma=86400';
 
     # Sent when QUIC was used
     add_header QUIC-Status $http3;
