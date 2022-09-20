@@ -1,5 +1,5 @@
 # https://hg.nginx.org/nginx-quic/fie/tip/src/core/nginx.h
-ARG NGINX_VERSION=1.23.1
+ARG NGINX_VERSION=1.23.2
 
 # https://hg.nginx.org/nginx-quic/shortlog/quic
 ARG NGINX_COMMIT=3550b00d9dc8
@@ -8,7 +8,7 @@ ARG NGINX_COMMIT=3550b00d9dc8
 ARG NGX_BROTLI_COMMIT=6e975bcb015f62e1f303054897783355e2a877dc
 
 # https://github.com/google/boringssl
-ARG BORINGSSL_COMMIT=8ce0e1c14e48109773f1e94e5f8b020aa1e24dc5
+ARG BORINGSSL_COMMIT=04989786e9ab16cef5261bbd05a2b1a8cb312dbf
 
 # http://hg.nginx.org/njs
 ARG NJS_COMMIT=b33aae5e8dc6
